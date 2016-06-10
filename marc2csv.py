@@ -7,6 +7,8 @@ import sys
 from pymarc import MARCReader
 
 filepath = 'data.mrc'
+infield_delim = ' | '
+
 if len(sys.argv) > 1:
     filepath = sys.argv[1]
 
@@ -21,10 +23,13 @@ marc_tags = []
 
 for marc_record in reader:
     csv_record = {}
-    for marc_field in marc_record.fields:
+    for marc_field in marc_record.fields: 
         if marc_field.tag not in marc_tags:
             marc_tags.append(marc_field.tag)
-        csv_record[marc_field.tag] = marc_field.value()
+        if not csv_record.get(marc_field.tag):
+            csv_record[marc_field.tag] = marc_field.value()
+        else:
+            csv_record[marc_field.tag] += infield_delim + str(marc_field.value())
     csv_records.append(csv_record)
 
 marc_tags.sort()
